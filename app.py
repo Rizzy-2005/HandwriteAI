@@ -1,4 +1,3 @@
-# Step 1: Import Flask and necessary libraries
 from flask import Flask, request, jsonify,render_template
 from flask_cors import CORS
 import os
@@ -10,7 +9,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import transforms
 
-# Step 2: Initialize Flask app
+
 app = Flask(__name__)
 CORS(app)
 
@@ -93,19 +92,16 @@ def predict(image):
   model.load_state_dict(model_state_dict)
   model.eval()
 
-  # Set up the device
   device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
   print(device)
   model.to(device)
 
-  # Define image transformations
   transform = transforms.Compose([
       transforms.Resize((128, 128)),
       transforms.ToTensor(),
       transforms.Normalize(mean=[0.5], std=[0.5])
   ])
 
-  # Replace with your image path
   image = image.convert("L")
   input_tensor = transform(image).unsqueeze(0).to(device)
 
@@ -118,25 +114,23 @@ def predict(image):
   print(output)
   print(f"Predicted Class Index: {predicted_class.item()}")
 
-  # Define a mapping from predicted class index to label
   predict_dict = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 'A_caps': 10, 'B_caps': 11, 'C_caps': 12, 'D_caps': 13, 'E_caps': 14, 'F_caps': 15, 'G_caps': 16, 'H_caps': 17, 'I_caps': 18, 'J_caps': 19, 'K_caps': 20, 'L_caps': 21, 'M_caps': 22, 'N_caps': 23, 'O_caps': 24, 'P_caps': 25, 'Q_caps': 26, 'R_caps': 27, 'S_caps': 28, 'T_caps': 29, 'U_caps': 30, 'V_caps': 31, 'W_caps': 32, 'X_caps': 33, 'Y_caps': 34, 'Z_caps': 35, 'a': 36, 'b': 37, 'c': 38, 'd': 39, 'e': 40, 'f': 41, 'g': 42, 'h': 43, 'i': 44, 'j': 45, 'k': 46, 'l': 47, 'm': 48, 'n': 49, 'o': 50, 'p': 51, 'q': 52, 'r': 53, 's': 54, 't': 55, 'u': 56, 'v': 57, 'w': 58, 'x': 59, 'y': 60, 'z': 61}
 
-  # Get the predicted label based on the class index
   label = list(predict_dict.keys())[predicted_class.item()]
   print(f"Predicted Label: {label}")
   return label
 
-# Step 4: Define an API route for image prediction
+
 @app.route('/predict', methods=['POST'])
 def check():
     try:
-        # Step 5: Receive Base64 image from frontend
+        #Receive Base64 image from frontend
         data = request.json['image']  # Get the image data from request
 
-        # Step 6: Convert Base64 to binary image data
+        #Convert Base64 to binary image data
         image_data = base64.b64decode(data.split(',')[1])  # Decode Base64
 
-        # Step 7: Convert to an actual image and save it
+        #Convert to an actual image and save it
         image = Image.open(BytesIO(image_data))
 
         print("Image received successfully!")
@@ -154,5 +148,5 @@ def about():
     return render_template("about.html")
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)  # Remove debug=True for production
+    app.run(host="0.0.0.0", port=5000)
 
