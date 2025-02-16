@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify,render_template
 from flask_cors import CORS
-import os
 from io import BytesIO
 from PIL import Image
 import base64
