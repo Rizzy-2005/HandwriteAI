@@ -8,6 +8,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import transforms
 import os
+import cv2
+import numpy as np
 
 app = Flask(__name__)
 CORS(app)
@@ -95,13 +97,14 @@ print(device)
 model.to(device)
 
 def predict(image):
+  
+  image = np.array(image)
+  image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+  image = cv2.resize(image, (128, 128), interpolation=cv2.INTER_AREA)
   transform = transforms.Compose([
-      transforms.Resize((128, 128)),
-      transforms.ToTensor(),
-      transforms.Normalize(mean=[0.5], std=[0.5])
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.5], std=[0.5])
   ])
-
-  image = image.convert("L")
   input_tensor = transform(image).unsqueeze(0).to(device)
 
   # Perform prediction
