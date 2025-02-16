@@ -82,19 +82,19 @@ class OptimizedCNN(nn.Module):
         x = torch.flatten(x, 1)
         x = self.fc(x)
         return x
-    
+#Model loading
+checkpoint = torch.load("Final_Model.pth", map_location=torch.device('cpu'))
+model_state_dict = checkpoint['model_state_dict']
+
+model = OptimizedCNN()
+model.load_state_dict(model_state_dict)
+model.eval()
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
+model.to(device)
+
 def predict(image):
-  checkpoint = torch.load("Final_Model.pth", map_location=torch.device('cpu'))
-  model_state_dict = checkpoint['model_state_dict']
-
-  model = OptimizedCNN()
-  model.load_state_dict(model_state_dict)
-  model.eval()
-
-  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-  print(device)
-  model.to(device)
-
   transform = transforms.Compose([
       transforms.Resize((128, 128)),
       transforms.ToTensor(),
