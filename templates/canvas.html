@@ -264,7 +264,7 @@
         try {
             const image = canvas.toDataURL("image/png");
 
-            const response = await fetch("https://handwriteai.onrender.com/predict", {
+            const response = await fetch("/predict", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ image: image })
