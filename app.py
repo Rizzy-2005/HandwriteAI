@@ -5,7 +5,6 @@ from PIL import Image
 import base64
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from torchvision import transforms
 import os
 import cv2
