@@ -1,5 +1,3 @@
-# app.py (Corrected for Deployment)
-
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from io import BytesIO
@@ -15,12 +13,10 @@ import numpy as np
 app = Flask(__name__)
 CORS(app)
 
-# --- MODEL DEFINITION ---
-# This section is perfect as-is.
+#MODEL DEFINITION
 class OptimizedCNN(nn.Module):
     def __init__(self, num_classes=62):
         super(OptimizedCNN, self).__init__()
-        # ... (your model architecture remains exactly the same) ...
         self.conv1 = nn.Sequential(
             nn.Conv2d(1, 32, kernel_size=3, padding=1),
             nn.BatchNorm2d(32),
@@ -78,23 +74,18 @@ class OptimizedCNN(nn.Module):
         x = self.fc(x)
         return x
 
-# --- MODEL LOADING (Corrected for Deployment) ---
-# 1. Be explicit that we are using the CPU.
+#MODEL LOADING
 device = torch.device('cpu')
 
-# 2. Load the model checkpoint. Your map_location is perfect.
 checkpoint = torch.load("Final_Model.pth", map_location=device)
 model_state_dict = checkpoint['model_state_dict']
 
-# 3. Instantiate the model and load the state.
 model = OptimizedCNN()
 model.load_state_dict(model_state_dict)
 
-# 4. Send the model to the CPU and put it in evaluation mode.
 model.to(device)
 model.eval()
 
-# --- PREDICTION FUNCTION (Corrected for Deployment) ---
 def predict(image):
   image = np.array(image)
   image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
@@ -104,22 +95,20 @@ def predict(image):
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.5], std=[0.5])
   ])
-  # Ensure the tensor is created on the CPU.
+
   input_tensor = transform(image).unsqueeze(0).to(device)
 
-  # Perform prediction
+  #Perform prediction
   with torch.no_grad():
       output = model(input_tensor)
       _, predicted_class = torch.max(output, 1)
 
-  # This mapping is perfect.
   class_map = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 'A_caps': 10, 'B_caps': 11, 'C_caps': 12, 'D_caps': 13, 'E_caps': 14, 'F_caps': 15, 'G_caps': 16, 'H_caps': 17, 'I_caps': 18, 'J_caps': 19, 'K_caps': 20, 'L_caps': 21, 'M_caps': 22, 'N_caps': 23, 'O_caps': 24, 'P_caps': 25, 'Q_caps': 26, 'R_caps': 27, 'S_caps': 28, 'T_caps': 29, 'U_caps': 30, 'V_caps': 31, 'W_caps': 32, 'X_caps': 33, 'Y_caps': 34, 'Z_caps': 35, 'a': 36, 'b': 37, 'c': 38, 'd': 39, 'e': 40, 'f': 41, 'g': 42, 'h': 43, 'i': 44, 'j': 45, 'k': 46, 'l': 47, 'm': 48, 'n': 49, 'o': 50, 'p': 51, 'q': 52, 'r': 53, 's': 54, 't': 55, 'u': 56, 'v': 57, 'w': 58, 'x': 59, 'y': 60, 'z': 61}
   
-  # Find the label corresponding to the predicted class index
   label = list(class_map.keys())[list(class_map.values()).index(predicted_class.item())]
   return label
 
-# --- FLASK ROUTES ---
+#FLASK ROUTES
 @app.route('/predict', methods=['POST'])
 def check():
     try:
@@ -139,8 +128,6 @@ def index():
 def about():
     return render_template("about.html")
 
-# --- MAIN BLOCK (Corrected for Deployment) ---
-# This block is for LOCAL DEVELOPMENT ONLY.
-# Gunicorn will ignore this and run the app directly.
+#MAIN BLOCK
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
